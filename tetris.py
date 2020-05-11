@@ -74,12 +74,9 @@ class tetrisPiece:
     def start(self):
         self.move(5, 0)
 
-    def validBlock(b, x, y):
-        return b.x + x > 0 or b.x + x < sizeX or b.y + y > 0 or b.y + y < sizeY
-
     def validMove(self, x, y): # Check if all moved pieces in valid place
         for b in self.pieces:
-            if not self.validBlock(b): # If not valid place
+            if not b.validBlock(x, y): # If not valid place
                return False
         return True
 
@@ -87,10 +84,8 @@ class tetrisPiece:
         if not self.validMove(x, y):
             return # If not valid move, do not do it
         for b in self.pieces:
-            if(b.x + x > 0 or b.x + x < sizeX):
-                b.x = b.x + x
-            if(b.y + y < 0 or b.y + y >= sizeY):
-                b.y = b.y + y
+            b.x = b.x + x
+            b.y = b.y + y
     
     def fall(self):
         for b in self.pieces:
@@ -98,13 +93,13 @@ class tetrisPiece:
     
     def canFall(self):
         for b in self.pieces:
-            if grid[b.x, b.y + 1] != None: # If someone below:
+            if not b.validBlock(0, 1) or grid[b.x, b.y + 1] != None: # If someone below:
                 return False
         return True 
 
     def validRotation(self, blocks):
         for b in blocks:
-            if not self.validBlock(b):
+            if not b.validBlock():
                 return False
         return True
 
@@ -124,6 +119,9 @@ class block:
         self.x = x
         self.y = y
         self.color = c
+
+    def validBlock(self, x = 0, y = 0):
+        return self.x + x >= 0 and self.x + x < sizeX and self.y + y >= 0 and self.y + y < sizeY
 
 # -------------     CODE      -------------
 
