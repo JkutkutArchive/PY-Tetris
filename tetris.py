@@ -197,12 +197,16 @@ while gameRunning:
             if grid[x, y] == None:
                 valid = False
                 break
-        if valid:
+        if valid: # If row filled
             validRows = validRows + 1
             for x in range(sizeX):
                 grid[x, y] = None
+            for y2 in range(y, 0, -1): # Make all rows fall. Last row always empty
+                for x in range(sizeX):
+                    grid[x, y2] = grid[x, y2 - 1]
+
     if validRows > 0:
-        score = score + validRows * 100 + (validRows - 1) * 50
+        score = score + validRows * 100 + (validRows - 1) * 100
 
     pygame.display.flip() # Update the screen
     
