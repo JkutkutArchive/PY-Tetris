@@ -16,7 +16,7 @@ def constant(f): #define of a constant class
 
 class color():
     def __init__(self):
-        self.BG = (255, 255, 255)
+        self.BG = (25, 25, 25)
         self.GRID = (128, 128, 128)
         self.BLACK = (0, 0, 0)
         self.WHITE = (255, 255, 255)
@@ -119,12 +119,25 @@ class tetrisPiece:
                 for i in range(-2, 2, 1):
                     self.pieces[i + 2].x = ini[0] + i
                     self.pieces[i + 2].y = ini[1]
-            
-        # elif self.type == 1: # "Square"
         # elif self.type == 2: # "T"
         # elif self.type == 3: # "L"
         # elif self.type == 4: # "L'"
-        # elif self.type == 5: # "Skew"
+        elif self.type == 5: # "Skew":
+            if self.pieces[0].y == self.pieces[1].y: # Horizontal position
+                ini = [self.pieces[2].x, self.pieces[2].y]
+                for i in range(2):
+                    self.pieces[i].x = ini[0] - 1
+                    self.pieces[i].y = ini[1] - 1 + i
+                self.pieces[3].x = ini[0]
+                self.pieces[3].y = ini[1] + 1
+            else:
+                ini = [self.pieces[2].x, self.pieces[2].y]
+                for i in range(2):
+                    self.pieces[i].x = ini[0] - 1 + i
+                    self.pieces[i].y = ini[1] + 1
+                self.pieces[3].x = ini[0] + 1
+                self.pieces[3].y = ini[1]
+
         # elif self.type == 6: # "Skew'"
 
     def typeConv(self): # to convert a int to the equivalent piece
@@ -164,8 +177,8 @@ COLOR = color() # Get the color class with the constants
 screen = pygame.display.set_mode((width + extraWidth + 2 * marginFrame, height + 2 * marginFrame)) # Set the size of the window
 
 font = pygame.font.Font('freesansbold.ttf', 32) 
-scoreLabel = font.render('Score:', False, COLOR.BLACK) 
-levelLabel = font.render('Level:', False, COLOR.BLACK) 
+scoreLabel = font.render('Score:', False, COLOR.WHITE) 
+levelLabel = font.render('Level:', False, COLOR.WHITE) 
 
 
 # State of the cells: None = empty, else = filled
@@ -203,9 +216,9 @@ while gameRunning:
 
     # Score and level:
     screen.blit(scoreLabel, (17.25 * sizeWidthX, 5 * sizeWidthY))
-    screen.blit(font.render(str(score), False, COLOR.BLACK), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 6 * sizeWidthY))
+    screen.blit(font.render(str(score), False, COLOR.WHITE), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 6 * sizeWidthY))
     screen.blit(levelLabel, (17.25 * sizeWidthX, 9 * sizeWidthY))
-    screen.blit(font.render(str(level), False, COLOR.BLACK), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 10 * sizeWidthY))
+    screen.blit(font.render(str(level), False, COLOR.WHITE), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 10 * sizeWidthY))
 
 
     # Check rows to add score and remove rows
