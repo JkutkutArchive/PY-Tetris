@@ -71,9 +71,17 @@ class tetrisPiece:
     def start(self):
         self.move(5, 0)
 
-    def move(self, x, y):
+    def validMove(self, x, y):
         for b in self.pieces:
-            if(b.x + x < 0 or b.x + x >= sizeX):
+            if b.x + x < 0 or b.x + x >= sizeX or b.y + y < 0 or b.y + y >= sizeY:
+               return False
+        return True
+
+    def move(self, x, y):
+        if not self.validMove(x, y):
+            return # If not valid move, do not do it
+        for b in self.pieces:
+            if(b.x + x > 0 or b.x + x < sizeX):
                 b.x = b.x + x
             if(b.y + y < 0 or b.y + y >= sizeY):
                 b.y = b.y + y
