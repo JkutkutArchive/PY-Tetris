@@ -62,15 +62,15 @@ class tetrisPiece:
         elif self.type == 1: # "Square"
             self.pieces = [block(i + 1, j, self.color)for i in range(2) for j in range(2)]
         elif self.type == 2: # "T"
-            self.pieces = [block(i, 1, self.color)for i in range(3)] + [block(1, 0, self.color)]
+            self.pieces = [block(i, 1, self.color) for i in range(3)] + [block(1, 0, self.color)]
         elif self.type == 3: # "L"
-            self.pieces = [block(i, 1, self.color)for i in range(3)] + [block(2, 0, self.color)]
+            self.pieces = [block(i, 1, self.color) for i in range(3)] + [block(2, 0, self.color)]
         elif self.type == 4: # "L'"
-            self.pieces = [block(i, 1, self.color)for i in range(3)] + [block(0, 0, self.color)]
+            self.pieces = [block(i, 1, self.color) for i in range(3)] + [block(0, 0, self.color)]
         elif self.type == 5: # "Skew"
-            self.pieces = [block(i, 1, self.color)for i in range(2)] + [block(i + 1, 0, self.color)for i in range(2)]
+            self.pieces = [block(i, 1, self.color) for i in range(2)] + [block(i + 1, 0, self.color)for i in range(2)]
         elif self.type == 6: # "Skew'"
-            self.pieces = [block(i, 0, self.color)for i in range(2)] + [block(i + 1, 1, self.color)for i in range(2)]
+            self.pieces = [block(i, 0, self.color) for i in range(2)] + [block(i + 1, 1, self.color)for i in range(2)]
 
     def start(self):
         self.move(5, 0)
@@ -105,38 +105,65 @@ class tetrisPiece:
         return True
 
     def rotate(self):
-        ini = [self.pieces[2].x, self.pieces[2].y]
         if self.pieces[0].y == self.pieces[1].y: # Horizontal position
             dh = 1
             dv = 0
         else:
             dh = 0
             dv = 1
+        ini = [self.pieces[2].x, self.pieces[2].y]
+        
         if self.type == 0: # "Straight"
             for i in range(-2, 2, 1):
                 self.pieces[i + 2].x = ini[0] + i * dv
                 self.pieces[i + 2].y = ini[1] + i * dh
-        
-        
-        
         elif self.type == 5: # "Skew":
             for i in range(2):
                 self.pieces[i].x = ini[0] - 1 + i * dv
                 self.pieces[i].y = ini[1] + (- 1 + i) * dh + dv
             self.pieces[3].x = ini[0] + dv
             self.pieces[3].y = ini[1] + dh
-
-
-
-
-
         elif self.type == 6: # "Skew'":
             for i in range(2):
                 self.pieces[i].x = ini[0] + dh + (-1 + i) * dv
                 self.pieces[i].y = ini[1] - 1 + i * dh 
             self.pieces[3].x = ini[0] + dv
             self.pieces[3].y = ini[1] + dh
-        # elif self.type == 2: # "T"
+        else:
+            ini = [self.pieces[1].x, self.pieces[1].y]
+            if self.type == 2: # "T"
+                if self.pieces[0].y == self.pieces[1].y: # Horizontal position
+                    if self.pieces[0].x < self.pieces[1].x: # 1
+                        print("1")
+                        for i in range(-1, 2, 1):
+                            self.pieces[i + 1].x = ini[0]
+                            self.pieces[i + 1].y = ini[1] - i
+                        self.pieces[3].x = ini[0] + 1
+                        self.pieces[3].y = ini[1]
+                    else: #3
+                        print("3")
+                        for i in range(-1, 2, 1):
+                            self.pieces[i + 1].x = ini[0]
+                            self.pieces[i + 1].y = ini[1] + i
+                        self.pieces[3].x = ini[0] - 1
+                        self.pieces[3].y = ini[1]
+                else: # Vertical
+                    if self.pieces[0].y < self.pieces[1].y: # 4
+                        print("4")
+                        for i in range(-1, 2, 1):
+                            self.pieces[i + 1].x = ini[0] + i
+                            self.pieces[i + 1].y = ini[1]
+                        self.pieces[3].x = ini[0]
+                        self.pieces[3].y = ini[1] - 1
+                    else: # 2
+                        print("2")
+                        for i in range(-1, 2, 1):
+                            self.pieces[i + 1].x = ini[0] - i
+                            self.pieces[i + 1].y = ini[1]
+                        self.pieces[3].x = ini[0]
+                        self.pieces[3].y = ini[1] + 1
+
+
         # elif self.type == 3: # "L"
         # elif self.type == 4: # "L'"
 
