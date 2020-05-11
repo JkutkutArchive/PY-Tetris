@@ -46,25 +46,33 @@ def getCubeCoord(x, y, *smaller): # Returns the same coordinates with the margin
     return [tuple(map(lambda i: i + marginFrame, tu)) for tu in rawCoord]
 
 class tetrisPiece:
-    def __init__(self, type):
+    def __init__(self):
         self.color = COLOR.RANDOM() # Get color
-        self.type = type # Store type
+        # self.type = type # Store type
         self.pieces = [] # Here the pieces will be stored
         # Straight: |   Square:   |   T:        |   L:        |   L':       |   Skew:
         # 0 0 0 0   |   - 0 0 -   |   - 0 - -   |   - - 0 -   |   0 - - -   |   - 0 0 -
         # - - - -   |   - 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 - -
+        self.type = np.random.randint(6) 
+        
+        if self.type == 0: # "Straight"
+            self.pieces = [bloq(i, 0, self.color)for i in range(4)]
+        elif self.type == 1: # "Square"
+            self.pieces = [bloq(i + 1, j, self.color)for i in range(2) for j in range(2)]
+        elif self.type == 2: # "T"
+            self.pieces = [bloq(i, 1, self.color)for i in range(3)] + [bloq(1, 0, self.color)]
+        elif self.type == 3: # "L"
+            self.pieces = [bloq(i, 1, self.color)for i in range(3)] + [bloq(2, 0, self.color)]
+        elif self.type == 4: # "L'"
+            self.pieces = [bloq(i, 1, self.color)for i in range(3)] + [bloq(0, 0, self.color)]
+        elif self.type == 5: # "Skew"
+            self.pieces = [bloq(i, 1, self.color)for i in range(2)] + [bloq(i + 1, 0, self.color)for i in range(2)]
 
-        # if self.typeConv[self.type] == "Straight":
-        #     for i in range(4):
-        #         self.pieces = self.pieces + [()]
-        # elif self.typeConv[self.type] == "Square":
-        # elif self.typeConv[self.type] == "T":
-        # elif self.typeConv[self.type] == "L":
-        # elif self.typeConv[self.type] == "Skew":
-
-    @constant
     def typeConv(self): # to convert a int to the equivalent piece
-        return ["Straight", "Square", "T", "L", "L'" "Skew"]
+        return ["Straight", "Square", "T", "L", "L'", "Skew"]
+    
+    def getTypeName(self):
+        return self.typeConv()[int(self.type)]
 
 class bloq:
     def __init__(self, x, y, c):
@@ -80,6 +88,7 @@ pygame.display.set_caption("Jkutkut's Tetris") # Set the title of the game
 
 # CONSTANTS
 score, level = 0, 0
+currentPiece, nextPiece = None, None
 width = 500 
 sizeX, sizeY = 14, 20 # Number of cell spots in each axis (horizontal, vertical)
 height = int(sizeY * width / sizeX)
@@ -99,6 +108,8 @@ levelLabel = font.render('Level:', False, COLOR.BLACK)
 
 # State of the cells: None = empty, else = filled
 grid = np.matrix([[None for j in range(sizeY)] for i in range(sizeX)])
+piece = tetrisPiece()
+print(piece.getTypeName())
 
 for i in range(sizeX-1):
     grid[i, 5] = COLOR.RANDOM()
