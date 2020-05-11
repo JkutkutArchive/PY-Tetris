@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import pygame # library to generate the graphic interface
 import numpy as np # library to handle matrices
-from math import floor # import this function
+# from math import floor # import this function
 import time # to set a delay between each iteration
 
 
@@ -158,32 +158,33 @@ currentPiece.start()
 for i in range(sizeX-1):
     grid[i, 19] = COLOR.RANDOM()
 
+lastGameTick = time.process_time() # store when we started
 gameRunning = True # If false, the game stops
 # timeRunning = False # If true, time runs (so iterations occur)
 while gameRunning:
     screen.fill(COLOR.BG) # Clean screen
-    
-    # newGrid = np.copy(grid) # Make a copy of the grid
     for x in range(sizeX): # for each spot in the grid
         for y in range(sizeY):
             # Draw the grid
-            pygame.draw.polygon(screen, COLOR.GRID, getCubeCoord(x, y), 1)
-            if(grid[x, y] != None):
-                pygame.draw.polygon(screen, grid[x, y], getCubeCoord(x, y, True), 0)
-    
+            pygame.draw.polygon(screen, COLOR.GRID, getCubeCoord(x, y), 1) # print the grid
+            if(grid[x, y] != None): # if block there
+                pygame.draw.polygon(screen, grid[x, y], getCubeCoord(x, y, True), 0) # print it
+    # print preview grid
     for x in range(4):
         for y in range(2):
             pygame.draw.polygon(screen, COLOR.GRID, getCubeCoord(x + 16, y + 1), 1)
     
+    #print current piece
     for b in currentPiece.pieces:
         pygame.draw.polygon(screen, b.color, getCubeCoord(b.x, b.y, True), 0)
+    
+    # print nextPiece
     for b in nextPiece.pieces:
         pygame.draw.polygon(screen, b.color, getCubeCoord(b.x + 16, b.y + 1, True), 0)
 
-
+    # Score and level:
     screen.blit(scoreLabel, (17.25 * sizeWidthX, 5 * sizeWidthY))
     screen.blit(font.render(str(score), False, COLOR.BLACK), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 6 * sizeWidthY))
-
     screen.blit(levelLabel, (17.25 * sizeWidthX, 9 * sizeWidthY))
     screen.blit(font.render(str(level), False, COLOR.BLACK), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 10 * sizeWidthY))
 
@@ -203,10 +204,18 @@ while gameRunning:
     if validRows > 0:
         score = score + validRows * 100 + (validRows - 1) * 50
 
-    if(currentPiece.canFall()):
-        currentPiece.fall()
     pygame.display.flip() # Update the screen
-    time.sleep(0.2) # set a delay between each iteration
+    
+    if time.process_time() - lastGameTick > 0.25: # Update the screen but game ticks every some period 
+        lastGameTick = time.process_time() # Update current game tick
+        if(currentPiece.canFall()):
+            currentPiece.fall()
+        else:
+            for b in currentPiece.pieces:
+                grid[b.x, b.y] = b.color
+            currentPiece = nextPiece
+            nextPiece = tetrisPiece()
+            currentPiece.start()
 
     for event in pygame.event.get(): # for each event
         if event.type == pygame.QUIT: # if quit btn pressed
@@ -224,6 +233,9 @@ while gameRunning:
             elif event.key == 276: # Arrow left
                 currentPiece.move(-1, 0)
             print(event.key)
+    
+
+    # gameRunning = False
 
 print("Thanks for playing, I hope you liked it.")
 print("See more projects like this one on https://github.com/jkutkut/")
