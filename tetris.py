@@ -68,6 +68,26 @@ class tetrisPiece:
         elif self.type == 5: # "Skew"
             self.pieces = [bloq(i, 1, self.color)for i in range(2)] + [bloq(i + 1, 0, self.color)for i in range(2)]
 
+    def start(self):
+        self.move(5, 0)
+
+    def move(self, x, y):
+        for b in self.pieces:
+            if(b.x + x < 0 or b.x + x >= sizeX):
+                b.x = b.x + x
+            if(b.y + y < 0 or b.y + y >= sizeY):
+                b.y = b.y + y
+    
+    def fall(self):
+        for b in self.pieces:
+            b.y = b.y + 1
+    
+    def canFall(self):
+        for b in self.pieces:
+            if grid[b.x, b.y + 1] != None: # If someone below:
+                return False
+        return True 
+
     def typeConv(self): # to convert a int to the equivalent piece
         return ["Straight", "Square", "T", "L", "L'", "Skew"]
     
@@ -108,8 +128,9 @@ levelLabel = font.render('Level:', False, COLOR.BLACK)
 
 # State of the cells: None = empty, else = filled
 grid = np.matrix([[None for j in range(sizeY)] for i in range(sizeX)])
-piece = tetrisPiece()
-print(piece.getTypeName())
+currentPiece = tetrisPiece()
+nextPiece = tetrisPiece()
+currentPiece.start()
 
 for i in range(sizeX-1):
     grid[i, 5] = COLOR.RANDOM()
@@ -130,6 +151,12 @@ while gameRunning:
     for x in range(4):
         for y in range(2):
             pygame.draw.polygon(screen, COLOR.GRID, getCubeCoord(x + 16, y + 1), 1)
+    
+    for b in currentPiece.pieces:
+        pygame.draw.polygon(screen, b.color, getCubeCoord(b.x, b.y, True), 0)
+    for b in nextPiece.pieces:
+        pygame.draw.polygon(screen, b.color, getCubeCoord(b.x + 16, b.y + 1, True), 0)
+
 
     screen.blit(scoreLabel, (17.25 * sizeWidthX, 5 * sizeWidthY))
     screen.blit(font.render(str(score), False, COLOR.BLACK), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 6 * sizeWidthY))
@@ -137,8 +164,6 @@ while gameRunning:
     screen.blit(levelLabel, (17.25 * sizeWidthX, 9 * sizeWidthY))
     screen.blit(font.render(str(level), False, COLOR.BLACK), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 10 * sizeWidthY))
 
-
-    pygame.display.flip() # Update the screen
 
     # Check rows to add score and remove rows
     validRows = 0
@@ -155,6 +180,10 @@ while gameRunning:
     if validRows > 0:
         score = score + validRows * 100 + (validRows - 1) * 50
 
+    if(currentPiece.canFall()):
+        currentPiece.fall()
+    pygame.display.flip() # Update the screen
+    time.sleep(0.2) # set a delay between each iteration
 
     for event in pygame.event.get(): # for each event
         if event.type == pygame.QUIT: # if quit btn pressed
@@ -166,6 +195,10 @@ while gameRunning:
                 score = score + 10
             elif event.key == 274: # Arrow down
                 score = score - 1
+            elif event.key == 275: # Arrow right
+                currentPiece.move(1, 0)
+            elif event.key == 276: # Arrow left
+                currentPiece.move(-1, 0)
             print(event.key)
 
 print("Thanks for playing, I hope you liked it.")
