@@ -5,7 +5,7 @@ import numpy as np # library to handle matrices
 import time # to set a delay between each iteration
 
 
-# -------------     FUNCTIONS AND CLASSES      -------------
+# -------------     FUNCTIONS      -------------
 
 def constant(f): #define of a constant class
     def fset(self, value):
@@ -33,7 +33,6 @@ class color():
         list = [colorSet[colorTitle] for colorTitle in [colorTitle for colorTitle in colorSet]]
         return list[np.random.randint(len(list))]
 
-
 def getCubeCoord(x, y, *smaller): # Returns the same coordinates with the margin frame
     smallerC = (sizeWidthX / 15) if smaller else 0 
     center = 1 if smaller else 0
@@ -45,6 +44,8 @@ def getCubeCoord(x, y, *smaller): # Returns the same coordinates with the margin
     ]
     return [tuple(map(lambda i: i + marginFrame, tu)) for tu in rawCoord]
 
+# -------------     CLASSES      -------------
+
 class tetrisPiece:
     def __init__(self):
         self.color = COLOR.RANDOM() # Get color
@@ -53,7 +54,7 @@ class tetrisPiece:
         # Straight: |   Square:   |   T:        |   L:        |   L':       |   Skew:     |   Skew':
         # 0 0 0 0   |   - 0 0 -   |   - 0 - -   |   - - 0 -   |   0 - - -   |   - 0 0 -   |   0 0 - -
         # - - - -   |   - 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 - -   |   - 0 0 -
-        self.type = np.random.randint(6) 
+        self.type = np.random.randint(7) 
         print(self.getTypeName() + " piece created")
         
         if self.type == 0: # "Straight"
@@ -103,13 +104,31 @@ class tetrisPiece:
                 return False
         return True
 
-    # def Rotate(self):
-
-
-
+    def rotate(self):
+        if self.type == 0: # "Straight"
+            if self.pieces[0].y == self.pieces[1].y: # Horizontal position
+                print("hori")
+                ini = [self.pieces[2].x, self.pieces[2].y]
+                for i in range(-2, 2, 1):
+                    print(i)
+                    self.pieces[i + 2].x = ini[0]
+                    self.pieces[i + 2].y = ini[1] + i
+            else:
+                print("vertical")
+                ini = [self.pieces[2].x, self.pieces[2].y]
+                for i in range(-2, 2, 1):
+                    self.pieces[i + 2].x = ini[0] + i
+                    self.pieces[i + 2].y = ini[1]
+            
+        # elif self.type == 1: # "Square"
+        # elif self.type == 2: # "T"
+        # elif self.type == 3: # "L"
+        # elif self.type == 4: # "L'"
+        # elif self.type == 5: # "Skew"
+        # elif self.type == 6: # "Skew'"
 
     def typeConv(self): # to convert a int to the equivalent piece
-        return ["Straight", "Square", "T", "L", "L'", "Skew"]
+        return ["Straight", "Square", "T", "L", "L'", "Skew", "Skew'"]
     
     def getTypeName(self):
         return self.typeConv()[int(self.type)]
@@ -231,7 +250,8 @@ while gameRunning:
             elif event.key == 273: # Arrow up
                 score = score + 10
             elif event.key == 274: # Arrow down
-                currentPiece.move(0, -1)
+                # currentPiece.move(0, -1)
+                currentPiece.rotate()
             elif event.key == 275: # Arrow right
                 currentPiece.move(1, 0)
             elif event.key == 276: # Arrow left
