@@ -138,7 +138,22 @@ class tetrisPiece:
                 self.pieces[3].x = ini[0] + 1
                 self.pieces[3].y = ini[1]
 
-        # elif self.type == 6: # "Skew'"
+        elif self.type == 6: # "Skew'":
+            if self.pieces[0].y == self.pieces[1].y: # Horizontal position
+                ini = [self.pieces[2].x, self.pieces[2].y]
+                for i in range(2):
+                    self.pieces[i].x = ini[0] + 1
+                    self.pieces[i].y = ini[1] - 1 + i
+                self.pieces[3].x = ini[0]
+                self.pieces[3].y = ini[1] + 1
+            else:
+                ini = [self.pieces[2].x, self.pieces[2].y]
+                for i in range(2):
+                    self.pieces[i].x = ini[0] - 1 + i
+                    self.pieces[i].y = ini[1] - 1
+                self.pieces[3].x = ini[0] + 1
+                self.pieces[3].y = ini[1]
+
 
     def typeConv(self): # to convert a int to the equivalent piece
         return ["Straight", "Square", "T", "L", "L'", "Skew", "Skew'"]
