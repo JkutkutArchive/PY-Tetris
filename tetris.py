@@ -47,13 +47,12 @@ def getCubeCoord(x, y, *smaller): # Returns the same coordinates with the margin
 
 class tetrisPiece:
     def __init__(self, type):
-        self.color = np.random.randint(5)
-        self.type = type
-        self.pieces = []
-        # Straight: |   Square:   |   T:        |   L:        |   Skew:
-        # - - - -   |   - - - -   |   - - - -   |   - 0 - -   |   - - - -
-        # 0 0 0 0   |   - 0 0 -   |   - 0 0 0   |   - 0 - -   |   - - 0 0
-        # - - - -   |   - 0 0 -   |   - - 0 -   |   - 0 0 -   |   - 0 0 -
+        self.color = COLOR.RANDOM() # Get color
+        self.type = type # Store type
+        self.pieces = [] # Here the pieces will be stored
+        # Straight: |   Square:   |   T:        |   L:        |   L':       |   Skew:
+        # 0 0 0 0   |   - 0 0 -   |   - 0 - -   |   - - 0 -   |   0 - - -   |   - 0 0 -
+        # - - - -   |   - 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 - -
 
         # if self.typeConv[self.type] == "Straight":
         #     for i in range(4):
@@ -65,7 +64,7 @@ class tetrisPiece:
 
     @constant
     def typeConv(self): # to convert a int to the equivalent piece
-        return ["Straight", "Square", "T", "L", "Skew"]
+        return ["Straight", "Square", "T", "L", "L'" "Skew"]
 
 class bloq:
     def __init__(self, x, y, c):
@@ -118,8 +117,8 @@ while gameRunning:
                 pygame.draw.polygon(screen, grid[x, y], getCubeCoord(x, y, True), 0)
     
     for x in range(4):
-        for y in range(3):
-            pygame.draw.polygon(screen, COLOR.GRID, getCubeCoord(x + 16, y), 1)
+        for y in range(2):
+            pygame.draw.polygon(screen, COLOR.GRID, getCubeCoord(x + 16, y + 1), 1)
 
     screen.blit(scoreLabel, (17.25 * sizeWidthX, 5 * sizeWidthY))
     screen.blit(font.render(str(score), False, COLOR.BLACK), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 6 * sizeWidthY))
