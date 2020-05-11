@@ -50,30 +50,36 @@ class tetrisPiece:
         self.color = COLOR.RANDOM() # Get color
         # self.type = type # Store type
         self.pieces = [] # Here the pieces will be stored
-        # Straight: |   Square:   |   T:        |   L:        |   L':       |   Skew:
-        # 0 0 0 0   |   - 0 0 -   |   - 0 - -   |   - - 0 -   |   0 - - -   |   - 0 0 -
-        # - - - -   |   - 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 - -
+        # Straight: |   Square:   |   T:        |   L:        |   L':       |   Skew:     |   Skew':
+        # 0 0 0 0   |   - 0 0 -   |   - 0 - -   |   - - 0 -   |   0 - - -   |   - 0 0 -   |   0 0 - -
+        # - - - -   |   - 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 - -   |   - 0 0 -
         self.type = np.random.randint(6) 
+        print(self.getTypeName() + " piece created")
         
         if self.type == 0: # "Straight"
-            self.pieces = [bloq(i, 0, self.color)for i in range(4)]
+            self.pieces = [block(i, 0, self.color)for i in range(4)]
         elif self.type == 1: # "Square"
-            self.pieces = [bloq(i + 1, j, self.color)for i in range(2) for j in range(2)]
+            self.pieces = [block(i + 1, j, self.color)for i in range(2) for j in range(2)]
         elif self.type == 2: # "T"
-            self.pieces = [bloq(i, 1, self.color)for i in range(3)] + [bloq(1, 0, self.color)]
+            self.pieces = [block(i, 1, self.color)for i in range(3)] + [block(1, 0, self.color)]
         elif self.type == 3: # "L"
-            self.pieces = [bloq(i, 1, self.color)for i in range(3)] + [bloq(2, 0, self.color)]
+            self.pieces = [block(i, 1, self.color)for i in range(3)] + [block(2, 0, self.color)]
         elif self.type == 4: # "L'"
-            self.pieces = [bloq(i, 1, self.color)for i in range(3)] + [bloq(0, 0, self.color)]
+            self.pieces = [block(i, 1, self.color)for i in range(3)] + [block(0, 0, self.color)]
         elif self.type == 5: # "Skew"
-            self.pieces = [bloq(i, 1, self.color)for i in range(2)] + [bloq(i + 1, 0, self.color)for i in range(2)]
+            self.pieces = [block(i, 1, self.color)for i in range(2)] + [block(i + 1, 0, self.color)for i in range(2)]
+        elif self.type == 6: # "Skew'"
+            self.pieces = [block(i, 0, self.color)for i in range(2)] + [block(i + 1, 1, self.color)for i in range(2)]
 
     def start(self):
         self.move(5, 0)
 
-    def validMove(self, x, y):
+    def validBlock(b, x, y):
+        return b.x + x > 0 or b.x + x < sizeX or b.y + y > 0 or b.y + y < sizeY
+
+    def validMove(self, x, y): # Check if all moved pieces in valid place
         for b in self.pieces:
-            if b.x + x < 0 or b.x + x >= sizeX or b.y + y < 0 or b.y + y >= sizeY:
+            if not self.validBlock(b): # If not valid place
                return False
         return True
 
@@ -96,13 +102,24 @@ class tetrisPiece:
                 return False
         return True 
 
+    def validRotation(self, blocks):
+        for b in blocks:
+            if not self.validBlock(b):
+                return False
+        return True
+
+    # def Rotate(self):
+
+
+
+
     def typeConv(self): # to convert a int to the equivalent piece
         return ["Straight", "Square", "T", "L", "L'", "Skew"]
     
     def getTypeName(self):
         return self.typeConv()[int(self.type)]
 
-class bloq:
+class block:
     def __init__(self, x, y, c):
         self.x = x
         self.y = y
@@ -141,7 +158,7 @@ nextPiece = tetrisPiece()
 currentPiece.start()
 
 for i in range(sizeX-1):
-    grid[i, 5] = COLOR.RANDOM()
+    grid[i, 19] = COLOR.RANDOM()
 
 gameRunning = True # If false, the game stops
 # timeRunning = False # If true, time runs (so iterations occur)
@@ -198,11 +215,12 @@ while gameRunning:
             gameRunning = False # no longer running game
         elif event.type == pygame.KEYDOWN:
             if event.key == 32: # Space pressed
-                timeRunning = not timeRunning # Togle the run of iterations
+                # timeRunning = not timeRunning # Togle the run of iterations
+                while currentPiece.canFall(): currentPiece.fall()
             elif event.key == 273: # Arrow up
                 score = score + 10
             elif event.key == 274: # Arrow down
-                score = score - 1
+                currentPiece.move(0, -1)
             elif event.key == 275: # Arrow right
                 currentPiece.move(1, 0)
             elif event.key == 276: # Arrow left
