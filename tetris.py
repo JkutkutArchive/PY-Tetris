@@ -134,61 +134,23 @@ class tetrisPiece:
                     self.pieces[i + 1].y = ini[1] + i * (- dh + ((dh + 1) % 2)) * dz
                 self.pieces[3].x = ini[0] + (dh - ((dh + 1) % 2)) * dz
                 self.pieces[3].y = ini[1] + (- dh + ((dh + 1) % 2)) * ((dz + 1) % 2)
-            elif self.type == 3: # "L"
-                if self.pieces[0].y == self.pieces[1].y: # Horizontal position
-                    if self.pieces[0].x < self.pieces[1].x: #1 
-                        for i in range(-1, 2, 1):
-                            self.pieces[i + 1].x = ini[0]
-                            self.pieces[i + 1].y = ini[1] + i
-                        self.pieces[3].x = ini[0] + 1
-                        self.pieces[3].y = ini[1] + 1
-                    else: # 3
-                        for i in range(-1, 2, 1):
-                            self.pieces[i + 1].x = ini[0]
-                            self.pieces[i + 1].y = ini[1] - i
-                        self.pieces[3].x = ini[0] - 1
-                        self.pieces[3].y = ini[1] - 1
-                else:
-                    if self.pieces[0].y < self.pieces[1].y: #2
-                        for i in range(-1, 2, 1):
-                            self.pieces[i + 1].x = ini[0] - i
-                            self.pieces[i + 1].y = ini[1]
-                        self.pieces[3].x = ini[0] - 1
-                        self.pieces[3].y = ini[1] + 1
-                    else: # 4
-                        for i in range(-1, 2, 1):
-                            self.pieces[i + 1].x = ini[0] + i
-                            self.pieces[i + 1].y = ini[1]
-                        self.pieces[3].x = ini[0] + 1
-                        self.pieces[3].y = ini[1] - 1
-                        
-            elif self.type == 4: # "L'"
-                if self.pieces[0].y == self.pieces[1].y: # Horizontal position
-                    if self.pieces[0].x < self.pieces[1].x: #1 
-                        for i in range(-1, 2, 1):
-                            self.pieces[i + 1].x = ini[0]
-                            self.pieces[i + 1].y = ini[1] + i
-                        self.pieces[3].x = ini[0] + 1
-                        self.pieces[3].y = ini[1] - 1
-                    else:
-                        for i in range(-1, 2, 1):
-                            self.pieces[i + 1].x = ini[0] 
-                            self.pieces[i + 1].y = ini[1] - i
-                        self.pieces[3].x = ini[0] - 1
-                        self.pieces[3].y = ini[1] + 1
-                else:
-                    if self.pieces[0].y < self.pieces[1].y: #2
-                        for i in range(-1, 2, 1):
-                            self.pieces[i + 1].x = ini[0] - i
-                            self.pieces[i + 1].y = ini[1]
-                        self.pieces[3].x = ini[0] + 1
-                        self.pieces[3].y = ini[1] + 1
-                    else:
-                        for i in range(-1, 2, 1):
-                            self.pieces[i + 1].x = ini[0] + i
-                            self.pieces[i + 1].y = ini[1]
-                        self.pieces[3].x = ini[0] - 1
-                        self.pieces[3].y = ini[1] - 1
+            else:
+                dt = 1 if self.type == 3 else -1 # 1 if L, -1 if L'
+                dh = 1 if self.pieces[0].y == self.pieces[1].y else 0 # Horizontal position (vertical = ((dh + 1) % 2))
+                # dv = 1 if self.pieces[0].x == self.pieces[1].x else 0 # Vertical position
+                dz = 1 if self.pieces[0].x < self.pieces[1].x or self.pieces[0].y < self.pieces[1].y else -1 # 1 or 2
+
+                for i in range(-1, 2, 1):
+                    self.pieces[i + 1].x = ini[0] - ((dh + 1) % 2) * dz * i
+                    self.pieces[i + 1].y = ini[1] + dh * dz * i
+                self.pieces[3].x = ini[0] + dh * dz - ((dh + 1) % 2) * dz * dt
+                self.pieces[3].y = ini[1] + dh * dz * dt + ((dh + 1) % 2) * dz
+
+                # for i in range(-1, 2, 1):
+                #     self.pieces[i + 1].x = ini[0] - dv * dz * i
+                #     self.pieces[i + 1].y = ini[1] + dh * dz * i
+                # self.pieces[3].x = ini[0] + dh * dz - dv * dz * dt
+                # self.pieces[3].y = ini[1] + dh * dz * dt + dv * dz
 
 
     def typeConv(self): # to convert a int to the equivalent piece
