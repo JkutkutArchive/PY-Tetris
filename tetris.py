@@ -107,7 +107,6 @@ class tetrisPiece:
     def rotate(self):
         dh = 1 if self.pieces[0].y == self.pieces[1].y else 0 # Horizontal position (dv = ((dh + 1) % 2))
         ini = [self.pieces[2].x, self.pieces[2].y]
-        
         if self.type == 0: # "Straight"
             for i in range(-2, 2, 1):
                 self.pieces[i + 2].x = ini[0] + i * ((dh + 1) % 2)
@@ -124,7 +123,7 @@ class tetrisPiece:
                 self.pieces[i].y = ini[1] - 1 + i * dh 
             self.pieces[3].x = ini[0] + ((dh + 1) % 2)
             self.pieces[3].y = ini[1] + dh
-        else:
+        else: # T, L, L'
             ini = [self.pieces[1].x, self.pieces[1].y]
             if self.type == 2: # "T"
                 dh = 1 if self.pieces[0].x < self.pieces[1].x or self.pieces[0].y < self.pieces[1].y else 0
@@ -137,33 +136,33 @@ class tetrisPiece:
             else:
                 dt = 1 if self.type == 3 else -1 # 1 if L, -1 if L'
                 dh = 1 if self.pieces[0].y == self.pieces[1].y else 0 # Horizontal position (vertical = ((dh + 1) % 2))
-                # dv = 1 if self.pieces[0].x == self.pieces[1].x else 0 # Vertical position
                 dz = 1 if self.pieces[0].x < self.pieces[1].x or self.pieces[0].y < self.pieces[1].y else -1 # 1 or 2
-
                 for i in range(-1, 2, 1):
                     self.pieces[i + 1].x = ini[0] - ((dh + 1) % 2) * dz * i
                     self.pieces[i + 1].y = ini[1] + dh * dz * i
                 self.pieces[3].x = ini[0] + dh * dz - ((dh + 1) % 2) * dz * dt
                 self.pieces[3].y = ini[1] + dh * dz * dt + ((dh + 1) % 2) * dz
 
-                # for i in range(-1, 2, 1):
-                #     self.pieces[i + 1].x = ini[0] - dv * dz * i
-                #     self.pieces[i + 1].y = ini[1] + dh * dz * i
-                # self.pieces[3].x = ini[0] + dh * dz - dv * dz * dt
-                # self.pieces[3].y = ini[1] + dh * dz * dt + dv * dz
-
-
     def typeConv(self): # to convert a int to the equivalent piece
         return ["Straight", "Square", "T", "L", "L'", "Skew", "Skew'"]
     
     def getTypeName(self):
         return self.typeConv()[int(self.type)]
+    
+    def copy(self):
+        newPiece = tetrisPiece()
+        newPiece.type = self.type
+        newPiece = [b.copy() for b in self.pieces]
+        return newPiece
 
 class block:
     def __init__(self, x, y, c):
         self.x = x
         self.y = y
         self.color = c
+
+    def copy(self):
+        return block(self.x, self.y, self.color)
 
     def validBlock(self, x = 0, y = 0):
         return self.x + x >= 0 and self.x + x < sizeX and self.y + y >= 0 and self.y + y < sizeY
