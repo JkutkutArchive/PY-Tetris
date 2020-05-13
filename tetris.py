@@ -34,7 +34,6 @@ class color():
 
 def getCubeCoord(x, y, *smaller): # Returns the same coordinates with the margin frame
     smallerC = 0 if not smaller else round(sizeWidthX / 14)
-    print(sizeWidthX / 15)
     rawCoord = [ # get coord of the cornes of the square
         (x * sizeWidthX + smallerC, y * sizeWidthY + smallerC),
         ((x + 1) * sizeWidthX - smallerC, y * sizeWidthY + smallerC),
@@ -248,7 +247,7 @@ while running:
         screen.blit(scoreLabel, (17.25 * sizeWidthX, 5 * sizeWidthY))
         screen.blit(font.render(str(score), False, COLOR.WHITE), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 6 * sizeWidthY))
         screen.blit(levelLabel, (17.25 * sizeWidthX, 9 * sizeWidthY))
-        screen.blit(font.render(str(level), False, COLOR.WHITE), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 10 * sizeWidthY))
+        screen.blit(font.render(str(level), False, COLOR.WHITE), ((18.5 - (len(str(level))-1)/4) * sizeWidthX, 10 * sizeWidthY))
 
 
         # Check rows to add score and remove rows
@@ -269,7 +268,7 @@ while running:
 
         if validRows > 0:
             score = score + validRows * 100 + (validRows - 1) * 100 # Update score
-            level = round(score / 1000)
+            level = int(score / 1000)
 
         pygame.display.flip() # Update the screen
         
