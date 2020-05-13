@@ -105,43 +105,48 @@ class tetrisPiece:
         return True
 
     def rotate(self):
-        dh = 1 if self.pieces[0].y == self.pieces[1].y else 0 # Horizontal position (dv = ((dh + 1) % 2))
-        ini = [self.pieces[2].x, self.pieces[2].y]
+        pieces = [b.copy() for b in self.pieces]
+        dh = 1 if pieces[0].y == pieces[1].y else 0 # Horizontal position (dv = ((dh + 1) % 2))
+        ini = [pieces[2].x, pieces[2].y]
         if self.type == 0: # "Straight"
             for i in range(-2, 2, 1):
-                self.pieces[i + 2].x = ini[0] + i * ((dh + 1) % 2)
-                self.pieces[i + 2].y = ini[1] + i * dh
+                pieces[i + 2].x = ini[0] + i * ((dh + 1) % 2)
+                pieces[i + 2].y = ini[1] + i * dh
         elif self.type == 5: # "Skew":
             for i in range(2):
-                self.pieces[i].x = ini[0] - 1 + i * ((dh + 1) % 2)
-                self.pieces[i].y = ini[1] + (- 1 + i) * dh + ((dh + 1) % 2)
-            self.pieces[3].x = ini[0] + ((dh + 1) % 2)
-            self.pieces[3].y = ini[1] + dh
+                pieces[i].x = ini[0] - 1 + i * ((dh + 1) % 2)
+                pieces[i].y = ini[1] + (- 1 + i) * dh + ((dh + 1) % 2)
+            pieces[3].x = ini[0] + ((dh + 1) % 2)
+            pieces[3].y = ini[1] + dh
         elif self.type == 6: # "Skew'":
             for i in range(2):
-                self.pieces[i].x = ini[0] + dh + (-1 + i) * ((dh + 1) % 2)
-                self.pieces[i].y = ini[1] - 1 + i * dh 
-            self.pieces[3].x = ini[0] + ((dh + 1) % 2)
-            self.pieces[3].y = ini[1] + dh
+                pieces[i].x = ini[0] + dh + (-1 + i) * ((dh + 1) % 2)
+                pieces[i].y = ini[1] - 1 + i * dh 
+            pieces[3].x = ini[0] + ((dh + 1) % 2)
+            pieces[3].y = ini[1] + dh
         else: # T, L, L'
-            ini = [self.pieces[1].x, self.pieces[1].y]
+            ini = [pieces[1].x, pieces[1].y]
             if self.type == 2: # "T"
-                dh = 1 if self.pieces[0].x < self.pieces[1].x or self.pieces[0].y < self.pieces[1].y else 0
-                dz = 1 if self.pieces[0].y == self.pieces[1].y else 0 # Horizontal position
+                dh = 1 if pieces[0].x < pieces[1].x or pieces[0].y < pieces[1].y else 0
+                dz = 1 if pieces[0].y == pieces[1].y else 0 # Horizontal position
                 for i in range(-1, 2, 1):
-                    self.pieces[i + 1].x = ini[0] + i * (dh - ((dh + 1) % 2)) * ((dz + 1) % 2)
-                    self.pieces[i + 1].y = ini[1] + i * (- dh + ((dh + 1) % 2)) * dz
-                self.pieces[3].x = ini[0] + (dh - ((dh + 1) % 2)) * dz
-                self.pieces[3].y = ini[1] + (- dh + ((dh + 1) % 2)) * ((dz + 1) % 2)
+                    pieces[i + 1].x = ini[0] + i * (dh - ((dh + 1) % 2)) * ((dz + 1) % 2)
+                    pieces[i + 1].y = ini[1] + i * (- dh + ((dh + 1) % 2)) * dz
+                pieces[3].x = ini[0] + (dh - ((dh + 1) % 2)) * dz
+                pieces[3].y = ini[1] + (- dh + ((dh + 1) % 2)) * ((dz + 1) % 2)
             else:
                 dt = 1 if self.type == 3 else -1 # 1 if L, -1 if L'
-                dh = 1 if self.pieces[0].y == self.pieces[1].y else 0 # Horizontal position (vertical = ((dh + 1) % 2))
-                dz = 1 if self.pieces[0].x < self.pieces[1].x or self.pieces[0].y < self.pieces[1].y else -1 # 1 or 2
+                dh = 1 if pieces[0].y == pieces[1].y else 0 # Horizontal position (vertical = ((dh + 1) % 2))
+                dz = 1 if pieces[0].x < pieces[1].x or pieces[0].y < pieces[1].y else -1 # 1 or 2
                 for i in range(-1, 2, 1):
-                    self.pieces[i + 1].x = ini[0] - ((dh + 1) % 2) * dz * i
-                    self.pieces[i + 1].y = ini[1] + dh * dz * i
-                self.pieces[3].x = ini[0] + dh * dz - ((dh + 1) % 2) * dz * dt
-                self.pieces[3].y = ini[1] + dh * dz * dt + ((dh + 1) % 2) * dz
+                    pieces[i + 1].x = ini[0] - ((dh + 1) % 2) * dz * i
+                    pieces[i + 1].y = ini[1] + dh * dz * i
+                pieces[3].x = ini[0] + dh * dz - ((dh + 1) % 2) * dz * dt
+                pieces[3].y = ini[1] + dh * dz * dt + ((dh + 1) % 2) * dz
+
+        # At this point, pieces are rotated
+        if(self.validRotation(pieces)):
+            self.pieces = [b for b in pieces]
 
     def typeConv(self): # to convert a int to the equivalent piece
         return ["Straight", "Square", "T", "L", "L'", "Skew", "Skew'"]
@@ -165,7 +170,7 @@ class block:
         return block(self.x, self.y, self.color)
 
     def validBlock(self, x = 0, y = 0):
-        return self.x + x >= 0 and self.x + x < sizeX and self.y + y >= 0 and self.y + y < sizeY
+        return self.x + x >= 0 and self.x + x < sizeX and self.y + y >= 0 and self.y + y < sizeY and grid[self.x + x, self.y + y] == None
 
 # -------------     CODE      -------------
 
