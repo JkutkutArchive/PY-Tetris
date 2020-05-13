@@ -34,13 +34,13 @@ class color():
         return list[np.random.randint(len(list))]
 
 def getCubeCoord(x, y, *smaller): # Returns the same coordinates with the margin frame
-    smallerC = (sizeWidthX / 15) if smaller else 0 
-    center = 1 if smaller else 0
+    smallerC = 0 if not smaller else round(sizeWidthX / 14)
+    print(sizeWidthX / 15)
     rawCoord = [ # get coord of the cornes of the square
-        (x * sizeWidthX + smallerC + center, y * sizeWidthY + smallerC + center),
-        ((x + 1) * sizeWidthX - smallerC, y * sizeWidthY + smallerC + center),
+        (x * sizeWidthX + smallerC, y * sizeWidthY + smallerC),
+        ((x + 1) * sizeWidthX - smallerC, y * sizeWidthY + smallerC),
         ((x + 1) * sizeWidthX - smallerC, (y + 1) * sizeWidthY - smallerC),
-        (x * sizeWidthX + smallerC + center, (y + 1) * sizeWidthY - smallerC)
+        (x * sizeWidthX + smallerC, (y + 1) * sizeWidthY - smallerC)
     ]
     return [tuple(map(lambda i: i + marginFrame, tu)) for tu in rawCoord]
 
@@ -74,7 +74,7 @@ class tetrisPiece:
 
     def start(self):
         self.move(5, 0)
-
+        
     def validMove(self, x, y): # Check if all moved pieces in valid place
         for b in self.pieces:
             if not b.validBlock(x, y): # If not valid place
@@ -88,15 +88,15 @@ class tetrisPiece:
             b.x = b.x + x
             b.y = b.y + y
     
-    def fall(self):
-        for b in self.pieces:
-            b.y = b.y + 1
-    
     def canFall(self):
         for b in self.pieces:
             if not b.validBlock(0, 1) or grid[b.x, b.y + 1] != None: # If someone below:
                 return False
         return True 
+
+    def fall(self):
+        for b in self.pieces:
+            b.y = b.y + 1
 
     def validRotation(self, blocks):
         for b in blocks:
@@ -105,6 +105,8 @@ class tetrisPiece:
         return True
 
     def rotate(self):
+        if self.type == 1: # square
+            return
         pieces = [b.copy() for b in self.pieces]
         dh = 1 if pieces[0].y == pieces[1].y else 0 # Horizontal position (dv = ((dh + 1) % 2))
         ini = [pieces[2].x, pieces[2].y]
@@ -160,6 +162,19 @@ class tetrisPiece:
         newPiece = [b.copy() for b in self.pieces]
         return newPiece
 
+    def getPosition(self):
+        minX, minY, maxX, maxY = sizeX, sizeY, 0, 0
+        for b in self.pieces:
+            if b.x < minX: 
+                minX = b.x
+            elif b.x > maxX:
+                maxX = b.x
+            if b.y < minY: 
+                minY = b.y
+            elif b.y > maxY:
+                maxY = b.y
+        return [[minX, minY], [maxX, maxY]]
+
 class block:
     def __init__(self, x, y, c):
         self.x = x
@@ -204,92 +219,106 @@ currentPiece = tetrisPiece()
 nextPiece = tetrisPiece()
 currentPiece.start()
 
-for i in range(sizeX-1):
-    grid[i, 19] = COLOR.RANDOM()
-
 lastGameTick = time.process_time() # store when we started
 gameRunning = True # If false, the game stops
+running = True
 # timeRunning = False # If true, time runs (so iterations occur)
-while gameRunning:
-    screen.fill(COLOR.BG) # Clean screen
-    for x in range(sizeX): # for each spot in the grid
+while running:
+    while gameRunning:
+        screen.fill(COLOR.BG) # Clean screen
+        for x in range(sizeX): # for each spot in the grid
+            for y in range(sizeY):
+                # Draw the grid
+                pygame.draw.polygon(screen, COLOR.GRID, getCubeCoord(x, y), 1) # print the grid
+                if(grid[x, y] != None): # if block there
+                    pygame.draw.polygon(screen, grid[x, y], getCubeCoord(x, y, True), 0) # print it
+        # print preview grid
+        for x in range(4):
+            for y in range(2):
+                pygame.draw.polygon(screen, COLOR.GRID, getCubeCoord(x + 16, y + 1), 1)
+        
+        #print current piece
+        for b in currentPiece.pieces:
+            pygame.draw.polygon(screen, b.color, getCubeCoord(b.x, b.y, True), 0)
+        
+        # print nextPiece
+        for b in nextPiece.pieces:
+            pygame.draw.polygon(screen, b.color, getCubeCoord(b.x + 16, b.y + 1, True), 0)
+
+        # Score and level:
+        screen.blit(scoreLabel, (17.25 * sizeWidthX, 5 * sizeWidthY))
+        screen.blit(font.render(str(score), False, COLOR.WHITE), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 6 * sizeWidthY))
+        screen.blit(levelLabel, (17.25 * sizeWidthX, 9 * sizeWidthY))
+        screen.blit(font.render(str(level), False, COLOR.WHITE), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 10 * sizeWidthY))
+
+
+        # Check rows to add score and remove rows
+        validRows = 0
         for y in range(sizeY):
-            # Draw the grid
-            pygame.draw.polygon(screen, COLOR.GRID, getCubeCoord(x, y), 1) # print the grid
-            if(grid[x, y] != None): # if block there
-                pygame.draw.polygon(screen, grid[x, y], getCubeCoord(x, y, True), 0) # print it
-    # print preview grid
-    for x in range(4):
-        for y in range(2):
-            pygame.draw.polygon(screen, COLOR.GRID, getCubeCoord(x + 16, y + 1), 1)
-    
-    #print current piece
-    for b in currentPiece.pieces:
-        pygame.draw.polygon(screen, b.color, getCubeCoord(b.x, b.y, True), 0)
-    
-    # print nextPiece
-    for b in nextPiece.pieces:
-        pygame.draw.polygon(screen, b.color, getCubeCoord(b.x + 16, b.y + 1, True), 0)
-
-    # Score and level:
-    screen.blit(scoreLabel, (17.25 * sizeWidthX, 5 * sizeWidthY))
-    screen.blit(font.render(str(score), False, COLOR.WHITE), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 6 * sizeWidthY))
-    screen.blit(levelLabel, (17.25 * sizeWidthX, 9 * sizeWidthY))
-    screen.blit(font.render(str(level), False, COLOR.WHITE), ((18.5 - (len(str(score))-1)/4) * sizeWidthX, 10 * sizeWidthY))
-
-
-    # Check rows to add score and remove rows
-    validRows = 0
-    for y in range(sizeY):
-        valid = True
-        for x in range(sizeX):
-            if grid[x, y] == None:
-                valid = False
-                break
-        if valid: # If row filled
-            validRows = validRows + 1
+            valid = True
             for x in range(sizeX):
-                grid[x, y] = None
-            for y2 in range(y, 0, -1): # Make all rows fall. Last row always empty
+                if grid[x, y] == None:
+                    valid = False
+                    break
+            if valid: # If row filled
+                validRows = validRows + 1
                 for x in range(sizeX):
-                    grid[x, y2] = grid[x, y2 - 1]
+                    grid[x, y] = None
+                for y2 in range(y, 0, -1): # Make all rows fall. Last row always empty
+                    for x in range(sizeX):
+                        grid[x, y2] = grid[x, y2 - 1]
 
-    if validRows > 0:
-        score = score + validRows * 100 + (validRows - 1) * 100
+        if validRows > 0:
+            score = score + validRows * 100 + (validRows - 1) * 100 # Update score
+            level = round(score / 1000)
 
-    pygame.display.flip() # Update the screen
-    
-    if time.process_time() - lastGameTick > 0.25: # Update the screen but game ticks every some period 
-        lastGameTick = time.process_time() # Update current game tick
-        if(currentPiece.canFall()):
-            currentPiece.fall()
-        else:
-            for b in currentPiece.pieces:
-                grid[b.x, b.y] = b.color
-            currentPiece = nextPiece
-            nextPiece = tetrisPiece()
-            currentPiece.start()
+        pygame.display.flip() # Update the screen
+        
+        if time.process_time() - lastGameTick > 0.25 - level/100: # Update the screen but game ticks every some period 
+            lastGameTick = time.process_time() # Update current game tick
+            if(currentPiece.canFall()):
+                currentPiece.fall()
+            else:
+                for b in currentPiece.pieces:
+                    grid[b.x, b.y] = b.color
+                currentPiece = nextPiece
+                nextPiece = tetrisPiece()
+                currentPiece.start()
+                if(currentPiece.getPosition()[0][0] < 2):
+                    print("Press R to restart")
+                    gameRunning = False
 
+        for event in pygame.event.get(): # for each event
+            if event.type == pygame.QUIT: # if quit btn pressed
+                gameRunning = False # no longer running game
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == 32: # Space pressed
+                    while currentPiece.canFall(): currentPiece.fall()
+                elif event.key == 273: # Arrow up or down
+                    currentPiece.rotate()
+                elif event.key == 274:
+                    currentPiece.fall()
+                elif event.key == 275: # Arrow right
+                    currentPiece.move(1, 0)
+                elif event.key == 276: # Arrow left
+                    currentPiece.move(-1, 0)
+                print(event.key)
+
+    # Game not Running at this point
     for event in pygame.event.get(): # for each event
         if event.type == pygame.QUIT: # if quit btn pressed
-            gameRunning = False # no longer running game
+            running = False # no longer running
         elif event.type == pygame.KEYDOWN:
-            if event.key == 32: # Space pressed
-                # timeRunning = not timeRunning # Togle the run of iterations
-                while currentPiece.canFall(): currentPiece.fall()
-            elif event.key == 273: # Arrow up
-                score = score + 10
-            elif event.key == 274: # Arrow down
-                # currentPiece.move(0, -1)
-                currentPiece.rotate()
-            elif event.key == 275: # Arrow right
-                currentPiece.move(1, 0)
-            elif event.key == 276: # Arrow left
-                currentPiece.move(-1, 0)
             print(event.key)
-    
-
-    # gameRunning = False
+            if event.key == 114: # R pressed: restart game
+                gameRunning = True
+                score = 0
+                level = 0
+                grid = np.matrix([[None for j in range(sizeY)] for i in range(sizeX)])
+                currentPiece = tetrisPiece()
+                nextPiece = tetrisPiece()
+                currentPiece.start()
 
 print("Thanks for playing, I hope you liked it.")
 print("See more projects like this one on https://github.com/jkutkut/")
