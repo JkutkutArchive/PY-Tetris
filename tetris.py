@@ -81,8 +81,7 @@ class tetrisPiece:
         # 0 0 0 0   |   - 0 0 -   |   - 0 - -   |   - - 0 -   |   0 - - -   |   - 0 0 -   |   0 0 - -
         # - - - -   |   - 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 0 -   |   0 0 - -   |   - 0 0 -
         self.type = np.random.randint(7) 
-        print(self.getTypeName() + " piece created")
-        
+        # print(self.getTypeName() + " piece created")
         if self.type == 0: # "Straight"
             self.color = COLOR.LBLUE
             self.pieces = [block(i, 0, self.color)for i in range(4)]
@@ -221,8 +220,8 @@ class block:
     def validBlock(self, x = 0, y = 0):
         return self.x + x >= 0 and self.x + x < sizeX and self.y + y >= 0 and self.y + y < sizeY and grid[self.x + x, self.y + y] == None
 
-# -------------     CODE      -------------
 
+# -------------     CODE      -------------
 
 pygame.init() # Init pygame
 pygame.display.set_caption("Jkutkut's Tetris") # Set the title of the game
@@ -254,7 +253,7 @@ lastKeyTick = time.process_time() # (updates the keys pressed to enable hold con
 gameRunning = True # If false, the game stops
 running = True
 
-keys = {"up": 0, "down": 0, "right": 0, "left": 0} # 0 = key up, 1 = Key down
+keys = {"up": 0, "down": 0, "right": 0, "left": 0} # 0 = key up, > 0 => Key down
 
 
 # timeRunning = False # If true, time runs (so iterations occur)
@@ -296,7 +295,6 @@ while running:
                             grid[x, y] = COLOR.RANDOM()
                     gameRunning = False
         
-
         if time.process_time() - lastKeyTick > 0.025: # key control
             lastKeyTick = time.process_time()
             k = pygame.key.get_pressed()  #checking pressed keys
@@ -326,16 +324,15 @@ while running:
             elif event.type == pygame.KEYDOWN:
                 if event.key == 32: # Space pressed
                     while currentPiece.canFall(): currentPiece.fall()
-                elif event.key == 273: # Arrow up
+                elif event.key == 273 or event.key == 119: # Arrow up
                     currentPiece.rotate()
-                elif event.key == 274: # Arrow down
+                elif event.key == 274 or event.key == 115: # Arrow down
                     currentPiece.fall()
-                elif event.key == 275: # Arrow right
+                elif event.key == 275 or event.key == 100: # Arrow right
                     currentPiece.move(1, 0)
-                elif event.key == 276: # Arrow left
+                elif event.key == 276 or event.key == 97: # Arrow left
                     currentPiece.move(-1, 0)
-                print(event.key)
-
+                # print(event.key)
         updateScreen()
 
 
