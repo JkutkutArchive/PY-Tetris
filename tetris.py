@@ -128,8 +128,9 @@ class tetrisPiece:
         return True 
 
     def fall(self):
-        for b in self.pieces:
-            b.y = b.y + 1
+        if self.canFall():
+            for b in self.pieces:
+                b.y = b.y + 1
 
     def validRotation(self, blocks):
         for b in blocks:
@@ -226,9 +227,7 @@ class block:
 pygame.init() # Init pygame
 pygame.display.set_caption("Jkutkut's Tetris") # Set the title of the game
 
-# CONSTANTS
-score, level = 0, 0
-currentPiece, nextPiece = None, None
+# CONSTANTS:
 width = 500 
 sizeX, sizeY = 14, 20 # Number of cell spots in each axis (horizontal, vertical)
 height = int(sizeY * width / sizeX)
@@ -237,24 +236,27 @@ marginFrame = 20
 sizeWidthX = width / sizeX # Size of each spot
 sizeWidthY = height / sizeY
 COLOR = color() # Get the color class with the constants
-
-
-screen = pygame.display.set_mode((width + extraWidth + 2 * marginFrame, height + 2 * marginFrame)) # Set the size of the window
-
 font = pygame.font.Font('freesansbold.ttf', 32) 
 scoreLabel = font.render('Score:', False, COLOR.WHITE) 
 levelLabel = font.render('Level:', False, COLOR.WHITE) 
 
 
-# State of the cells: None = empty, else = filled
-grid = np.matrix([[None for j in range(sizeY)] for i in range(sizeX)])
-currentPiece = tetrisPiece()
-nextPiece = tetrisPiece()
-currentPiece.start()
-
-lastGameTick = time.process_time() # store when we started
+# Variables:
+score, level = 0, 0
+currentPiece, nextPiece = None, None
+grid = np.matrix([[None for j in range(sizeY)] for i in range(sizeX)])# Init grid: None = empty, else = filled
+currentPiece = tetrisPiece() # Piece that is going to start falling
+nextPiece = tetrisPiece() # Next piece
+currentPiece.start() # Place the currentPiece on the 
+screen = pygame.display.set_mode((width + extraWidth + 2 * marginFrame, height + 2 * marginFrame)) # Set the size of the window
+lastGameTick = time.process_time() # store when we started (updates the screen)
+lastKeyTick = time.process_time() # (updates the keys pressed to enable hold controls)
 gameRunning = True # If false, the game stops
 running = True
+
+keys = {"up": 0, "down": 0, "right": 0, "left": 0} # 0 = key up, 1 = Key down
+
+
 # timeRunning = False # If true, time runs (so iterations occur)
 while running:
     while gameRunning:
@@ -293,7 +295,29 @@ while running:
                         for y in range(sizeY):
                             grid[x, y] = COLOR.RANDOM()
                     gameRunning = False
-        updateScreen()
+        
+
+        if time.process_time() - lastKeyTick > 0.025: # key control
+            lastKeyTick = time.process_time()
+            k = pygame.key.get_pressed()  #checking pressed keys
+            if k[pygame.K_DOWN] or k[pygame.K_s]: # arrow down
+                keys["down"] = keys["down"] + 1
+                if keys["down"] > 3:
+                    currentPiece.fall()
+            else:
+                keys["down"] = 0
+            if k[pygame.K_RIGHT] or k[pygame.K_d]: # arrow right
+                keys["right"] = keys["right"] + 1
+                if keys["right"] > 3:
+                    currentPiece.move(1, 0)
+            else:
+                keys["right"] = 0
+            if k[pygame.K_LEFT] or k[pygame.K_a]: # arrow left
+                keys["left"] = keys["left"] + 1
+                if keys["left"] > 3:
+                    currentPiece.move(-1, 0)
+            else:
+                keys["left"] = 0    
 
         for event in pygame.event.get(): # for each event
             if event.type == pygame.QUIT: # if quit btn pressed
@@ -302,15 +326,18 @@ while running:
             elif event.type == pygame.KEYDOWN:
                 if event.key == 32: # Space pressed
                     while currentPiece.canFall(): currentPiece.fall()
-                elif event.key == 273: # Arrow up or down
+                elif event.key == 273: # Arrow up
                     currentPiece.rotate()
-                elif event.key == 274:
+                elif event.key == 274: # Arrow down
                     currentPiece.fall()
                 elif event.key == 275: # Arrow right
                     currentPiece.move(1, 0)
                 elif event.key == 276: # Arrow left
                     currentPiece.move(-1, 0)
                 print(event.key)
+
+        updateScreen()
+
 
     # Game not Running at this point
     for event in pygame.event.get(): # for each event
