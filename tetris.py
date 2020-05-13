@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import pygame # library to generate the graphic interface
 import numpy as np # library to handle matrices
-# from math import floor # import this function
 import time # to set a delay between each iteration
 
 
