@@ -19,13 +19,13 @@ class color():
         self.GRID = (128, 128, 128)
         self.BLACK = (0, 0, 0)
         self.WHITE = (255, 255, 255)
-        self.DBLUE = (0, 153, 255)
-        self.LBLUE = (102, 255, 255)
-        self.PINK = (255, 0, 255)
-        self.GREEN = (102, 255, 102)
-        self.YELLOW = (255, 255, 102)
-        self.ORANGE = (255, 102, 0)
-        self.RED = (255, 80, 80)
+        self.DBLUE = (0, 153, 255) # L'
+        self.LBLUE = (102, 255, 255) # Straight
+        self.PURPLE = (153, 51, 255) # T
+        self.GREEN = (102, 255, 102) #skew
+        self.YELLOW = (255, 255, 102) #square
+        self.ORANGE = (255, 102, 0) # L
+        self.RED = (255, 80, 80) # Skew'
     def RANDOM(self):
         colorSet = dict(self.__dict__)
         for x in ["BG", "GRID", "WHITE", "BLACK"]: del colorSet[x] # Remove not wanted colors
@@ -75,8 +75,7 @@ def updateScreen():
 
 class tetrisPiece:
     def __init__(self):
-        self.color = COLOR.RANDOM() # Get color
-        # self.type = type # Store type
+        # self.color = COLOR.RANDOM() # Get color
         self.pieces = [] # Here the pieces will be stored
         # Straight: |   Square:   |   T:        |   L:        |   L':       |   Skew:     |   Skew':
         # 0 0 0 0   |   - 0 0 -   |   - 0 - -   |   - - 0 -   |   0 - - -   |   - 0 0 -   |   0 0 - -
@@ -85,18 +84,25 @@ class tetrisPiece:
         print(self.getTypeName() + " piece created")
         
         if self.type == 0: # "Straight"
+            self.color = COLOR.LBLUE
             self.pieces = [block(i, 0, self.color)for i in range(4)]
         elif self.type == 1: # "Square"
+            self.color = COLOR.YELLOW
             self.pieces = [block(i + 1, j, self.color)for i in range(2) for j in range(2)]
         elif self.type == 2: # "T"
+            self.color = COLOR.PURPLE
             self.pieces = [block(i, 1, self.color) for i in range(3)] + [block(1, 0, self.color)]
         elif self.type == 3: # "L"
+            self.color = COLOR.ORANGE
             self.pieces = [block(i, 1, self.color) for i in range(3)] + [block(2, 0, self.color)]
         elif self.type == 4: # "L'"
+            self.color = COLOR.DBLUE
             self.pieces = [block(i, 1, self.color) for i in range(3)] + [block(0, 0, self.color)]
         elif self.type == 5: # "Skew"
+            self.color = COLOR.GREEN
             self.pieces = [block(i, 1, self.color) for i in range(2)] + [block(i + 1, 0, self.color)for i in range(2)]
         elif self.type == 6: # "Skew'"
+            self.color = COLOR.RED
             self.pieces = [block(i, 0, self.color) for i in range(2)] + [block(i + 1, 1, self.color)for i in range(2)]
 
     def start(self):
@@ -267,7 +273,6 @@ while running:
                 for y2 in range(y, 0, -1): # Make all rows fall. Last row always empty
                     for x in range(sizeX):
                         grid[x, y2] = grid[x, y2 - 1]
-
         if validRows > 0:
             score = score + validRows * 100 + (validRows - 1) * 100 # Update score
             level = int(score / 1000)
