@@ -252,6 +252,7 @@ lastGameTick = time.process_time() # store when we started (updates the screen)
 lastKeyTick = time.process_time() # (updates the keys pressed to enable hold controls)
 gameRunning = True # If false, the game stops
 running = True
+pause = False
 
 keys = {"up": 0, "down": 0, "right": 0, "left": 0} # 0 = key up, > 0 => Key down
 
@@ -278,7 +279,7 @@ while running:
             score = score + validRows * 100 + (validRows - 1) * 100 # Update score
             level = int(score / 1000)
         
-        if time.process_time() - lastGameTick > 0.25 - level/100: # Update the screen but game ticks every some period 
+        if not pause and time.process_time() - lastGameTick > 0.25 - level/100: # Update the screen but game ticks every some period 
             lastGameTick = time.process_time() # Update current game tick
             if(currentPiece.canFall()):
                 currentPiece.fall()
@@ -289,13 +290,13 @@ while running:
                 nextPiece = tetrisPiece()
                 currentPiece.start()
                 if(currentPiece.getPosition()[0][0] < 2):
-                    print("Press R to restart")
+                    print("Press R or space to restart")
                     for x in range(sizeX):
                         for y in range(sizeY):
                             grid[x, y] = COLOR.RANDOM()
                     gameRunning = False
         
-        if time.process_time() - lastKeyTick > 0.025: # key control
+        if not pause and time.process_time() - lastKeyTick > 0.025: # key control
             lastKeyTick = time.process_time()
             k = pygame.key.get_pressed()  #checking pressed keys
             if k[pygame.K_DOWN] or k[pygame.K_s]: # arrow down
@@ -321,11 +322,19 @@ while running:
             if event.type == pygame.QUIT: # if quit btn pressed
                 gameRunning = False # no longer running game
                 running = False
+            
             elif (event.type == pygame.ACTIVEEVENT and event.state == 2): # If change on the focus of the window
                 if event.gain == 0: # If focus lost
                     print("lost focus")
+                    pause = True
                 elif event.gain == 1: # If focus recovered
                     print("focus")
+                    pause = False
+                    lastKeyTick = time.process_time() # Restore the 
+
+
+
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == 32: # Space pressed
                     while currentPiece.canFall(): currentPiece.fall()
