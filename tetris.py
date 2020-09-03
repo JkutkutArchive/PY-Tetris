@@ -321,6 +321,11 @@ while running:
             if event.type == pygame.QUIT: # if quit btn pressed
                 gameRunning = False # no longer running game
                 running = False
+            elif (event.type == pygame.ACTIVEEVENT and event.state == 2): # If change on the focus of the window
+                if event.gain == 0: # If focus lost
+                    print("lost focus")
+                elif event.gain == 1: # If focus recovered
+                    print("focus")
             elif event.type == pygame.KEYDOWN:
                 if event.key == 32: # Space pressed
                     while currentPiece.canFall(): currentPiece.fall()
@@ -342,7 +347,7 @@ while running:
             running = False # no longer running
         elif event.type == pygame.KEYDOWN:
             print(event.key)
-            if event.key == 114: # R pressed: restart game
+            if event.key == 114 or event.key == 32: # R or space pressed: restart game
                 gameRunning = True
                 score = 0
                 level = 0
