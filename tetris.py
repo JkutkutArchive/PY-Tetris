@@ -106,7 +106,7 @@ class tetrisPiece:
 
     def start(self):
         self.move(5, 0)
-        
+
     def validMove(self, x, y): # Check if all moved pieces in valid place
         for b in self.pieces:
             if not b.validBlock(x, y): # If not valid place
@@ -119,7 +119,7 @@ class tetrisPiece:
         for b in self.pieces:
             b.x = b.x + x
             b.y = b.y + y
-    
+
     def canFall(self):
         for b in self.pieces:
             if not b.validBlock(0, 1) or grid[b.x, b.y + 1] != None: # If someone below:
@@ -278,7 +278,7 @@ while running:
         if validRows > 0:
             score = score + validRows * 100 + (validRows - 1) * 100 # Update score
             level = int(score / 1000)
-        
+
         if not pause and time.process_time() - lastGameTick > 0.25 - level/100: # Update the screen but game ticks every some period 
             lastGameTick = time.process_time() # Update current game tick
             if(currentPiece.canFall()):
@@ -295,7 +295,7 @@ while running:
                         for y in range(sizeY):
                             grid[x, y] = COLOR.RANDOM()
                     gameRunning = False
-        
+
         if not pause and time.process_time() - lastKeyTick > 0.025: # key control
             lastKeyTick = time.process_time()
             k = pygame.key.get_pressed()  #checking pressed keys
@@ -316,13 +316,13 @@ while running:
                 if keys["left"] > 3:
                     currentPiece.move(-1, 0)
             else:
-                keys["left"] = 0    
+                keys["left"] = 0
 
         for event in pygame.event.get(): # for each event
             if event.type == pygame.QUIT: # if quit btn pressed
                 gameRunning = False # no longer running game
                 running = False
-            
+
             elif (event.type == pygame.ACTIVEEVENT and event.state == 2): # If change on the focus of the window
                 if event.gain == 0: # If focus lost
                     print("lost focus")
@@ -330,23 +330,20 @@ while running:
                 elif event.gain == 1: # If focus recovered
                     print("focus")
                     pause = False
-                    lastKeyTick = time.process_time() # Restore the 
-
-
-
+                    lastKeyTick = time.process_time()
 
             elif event.type == pygame.KEYDOWN:
-                if event.key == 32: # Space pressed
+                if event.key == pygame.K_SPACE: # Space pressed
                     while currentPiece.canFall(): currentPiece.fall()
-                elif event.key == 273 or event.key == 119: # Arrow up
+                elif event.key == pygame.K_UP or event.key == pygame.K_w: # Arrow up
                     currentPiece.rotate()
-                elif event.key == 274 or event.key == 115: # Arrow down
+                elif event.key == pygame.K_DOWN or event.key == pygame.K_s: # Arrow down
                     currentPiece.fall()
-                elif event.key == 275 or event.key == 100: # Arrow right
+                elif event.key == pygame.K_RIGHT or event.key == pygame.K_d: # Arrow right
                     currentPiece.move(1, 0)
-                elif event.key == 276 or event.key == 97: # Arrow left
+                elif event.key == pygame.K_LEFT or event.key == pygame.K_a: # Arrow left
                     currentPiece.move(-1, 0)
-                # print(event.key)
+                #print(event.key, pygame.K_UP)
         updateScreen()
 
 
